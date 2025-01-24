@@ -69,11 +69,9 @@ app.get("/", (req, res) => {
   });
 });
 
-// an endpoint with params that does the saame as save, but is a get request instead
-app.get("/save/:quizData", async (req, res) => {
-  const { quizData } = await req.params["quizData"];
-
-  console.log("Received quiz data on GET:", quizData);
+// POST endpoint to store data
+app.post("/save", async (req, res) => {
+  const { quizData } = req.body;
 
   if (!quizData) {
     return res
@@ -84,34 +82,6 @@ app.get("/save/:quizData", async (req, res) => {
   const parsedQuizData = JSON.parse(quizData);
 
   console.log("Parsed quiz data:", parsedQuizData);
-
-  try {
-    const quizId = require("uuid").v4(); // Generate unique ID
-    const result = await pool.query(
-      "INSERT INTO quizzes (quiz_id, quiz_data) VALUES ($1, $2) RETURNING quiz_id",
-      [quizId, JSON.stringify(parsedQuizData)]
-    );
-
-    res.status(200).send({
-      status: "success",
-      message: "Quiz successfully stored",
-      quizId: result.rows[0].quiz_id,
-    });
-  } catch (error) {
-    console.error("Error storing quiz:", error);
-    res.status(500).send({ status: "error", message: "Database error" });
-  }
-});
-
-// POST endpoint to store data
-app.post("/save", async (req, res) => {
-  const { quizData } = req.body;
-
-  if (!quizData) {
-    return res
-      .status(400)
-      .send({ status: "error", message: "quizData is required" });
-  }
 
   try {
     const quizId = require("uuid").v4(); // Generate unique ID
