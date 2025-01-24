@@ -79,26 +79,28 @@ app.post("/save", async (req, res) => {
       .send({ status: "error", message: "quizData is required" });
   }
 
+  console.log("QUiz data:", quizData);
+
   const parsedQuizData = JSON.parse(quizData);
 
   console.log("Parsed quiz data:", parsedQuizData);
 
-  try {
-    const quizId = require("uuid").v4(); // Generate unique ID
-    const result = await pool.query(
-      "INSERT INTO quizzes (quiz_id, quiz_data) VALUES ($1, $2) RETURNING quiz_id",
-      [quizId, JSON.stringify(quizData)]
-    );
+  // try {
+  //   const quizId = require("uuid").v4(); // Generate unique ID
+  //   const result = await pool.query(
+  //     "INSERT INTO quizzes (quiz_id, quiz_data) VALUES ($1, $2) RETURNING quiz_id",
+  //     [quizId, JSON.stringify(quizData)]
+  //   );
 
-    res.status(200).send({
-      status: "success",
-      message: "Quiz successfully stored",
-      quizId: result.rows[0].quiz_id,
-    });
-  } catch (error) {
-    console.error("Error storing quiz:", error);
-    res.status(500).send({ status: "error", message: "Database error" });
-  }
+  //   res.status(200).send({
+  //     status: "success",
+  //     message: "Quiz successfully stored",
+  //     quizId: result.rows[0].quiz_id,
+  //   });
+  // } catch (error) {
+  //   console.error("Error storing quiz:", error);
+  //   res.status(500).send({ status: "error", message: "Database error" });
+  // }
 });
 
 // Start the server
