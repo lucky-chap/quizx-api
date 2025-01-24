@@ -81,11 +81,15 @@ app.get("/save/:quizData", async (req, res) => {
       .send({ status: "error", message: "quizData is required" });
   }
 
+  const parsedQuizData = JSON.parse(quizData);
+
+  console.log("Parsed quiz data:", parsedQuizData);
+
   try {
     const quizId = require("uuid").v4(); // Generate unique ID
     const result = await pool.query(
       "INSERT INTO quizzes (quiz_id, quiz_data) VALUES ($1, $2) RETURNING quiz_id",
-      [quizId, JSON.stringify(quizData)]
+      [quizId, JSON.stringify(parsedQuizData)]
     );
 
     res.status(200).send({
