@@ -128,6 +128,6 @@ app.post("/save", async (req, res) => {
 });
 
 // Start the server
-app.listen(() => {
+app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
