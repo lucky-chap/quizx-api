@@ -7,7 +7,7 @@ const cors = require("cors");
 const { Pool } = require("pg");
 
 const app = express();
-const port = process.env.SERVER_PORT || 3000;
+const port = process.env.PORT || 3000;
 
 // Enable CORS for all origins
 app.use(cors());
@@ -129,5 +129,5 @@ app.post("/save", async (req, res) => {
 
 // Start the server
 app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+  console.log(`Server running on port ${port}`);
 });
