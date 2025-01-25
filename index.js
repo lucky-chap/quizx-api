@@ -104,11 +104,11 @@ app.post("/save", async (req, res) => {
 
     res.status(200).json({
       status: "success",
-      message: "Quiz successfully stored",
-      quizId: result.rows[0].id,
+      message: "Typing content successfully stored",
+      id: result.rows[0].id,
     });
   } catch (error) {
-    console.error("Error storing quiz:", error);
+    console.error("Error storing content:", error);
     res.status(500).json({ status: "error", message: "Database error" });
   }
 });
