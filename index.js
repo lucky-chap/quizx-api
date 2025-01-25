@@ -79,38 +79,40 @@ app.post("/save", async (req, res) => {
       .send({ status: "error", message: "quizData is required" });
   }
 
-  const processedQuizData = quizData
-    .replace(/[\u201C\u201D\u2018\u2019]/g, '"')
-    .replace(/```json\s*|\s*```/g, "")
-    .replace(/\n/g, "")
-    .replace(/,\s*([}\]])/g, "$1")
-    .replace(/([{,]\s*)(\w+)(:)/g, '$1"$2"$3')
-    // Fix nested arrays in options
-    .replace(/\[\s*\[(.*?)\]\s*,/g, '["$1",')
-    .trim();
+  console.log("Quiz data:", quizData);
 
-  console.log("Processed quiz data:", processedQuizData);
+  // const processedQuizData = quizData
+  //   .replace(/[\u201C\u201D\u2018\u2019]/g, '"')
+  //   .replace(/```json\s*|\s*```/g, "")
+  //   .replace(/\n/g, "")
+  //   .replace(/,\s*([}\]])/g, "$1")
+  //   .replace(/([{,]\s*)(\w+)(:)/g, '$1"$2"$3')
+  //   // Fix nested arrays in options
+  //   .replace(/\[\s*\[(.*?)\]\s*,/g, '["$1",')
+  //   .trim();
 
-  const parsedQuizData = JSON.parse(processedQuizData);
+  // console.log("Processed quiz data:", processedQuizData);
 
-  console.log("Parsed quiz data:", parsedQuizData);
+  // const parsedQuizData = JSON.parse(processedQuizData);
 
-  try {
-    const quizId = require("uuid").v4(); // Generate unique ID
-    const result = await pool.query(
-      "INSERT INTO quizzes (quiz_id, quiz_data) VALUES ($1, $2) RETURNING quiz_id",
-      [quizId, JSON.stringify(parsedQuizData)]
-    );
+  // console.log("Parsed quiz data:", parsedQuizData);
 
-    res.status(200).send({
-      status: "success",
-      message: "Quiz successfully stored",
-      quizId: result.rows[0].quiz_id,
-    });
-  } catch (error) {
-    console.error("Error storing quiz:", error);
-    res.status(500).send({ status: "error", message: "Database error" });
-  }
+  // try {
+  //   const quizId = require("uuid").v4(); // Generate unique ID
+  //   const result = await pool.query(
+  //     "INSERT INTO quizzes (quiz_id, quiz_data) VALUES ($1, $2) RETURNING quiz_id",
+  //     [quizId, JSON.stringify(parsedQuizData)]
+  //   );
+
+  //   res.status(200).send({
+  //     status: "success",
+  //     message: "Quiz successfully stored",
+  //     quizId: result.rows[0].quiz_id,
+  //   });
+  // } catch (error) {
+  //   console.error("Error storing quiz:", error);
+  //   res.status(500).send({ status: "error", message: "Database error" });
+  // }
 });
 
 // Start the server
