@@ -102,11 +102,11 @@ app.post("/save", async (req, res) => {
       [contentId, JSON.stringify(sanitizedContent)]
     );
 
-    res.status(200).json({
-      status: "success",
-      message: "Typing content successfully stored",
-      id: result.rows[0].id,
-    });
+    res
+      .status(200)
+      .send(
+        `Hurray! You can now view and type your content over at https://quizx-agent.vercel.app/${contentId}`
+      );
   } catch (error) {
     console.error("Error storing content:", error);
     res.status(500).json({ status: "error", message: "Database error" });
