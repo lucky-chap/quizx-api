@@ -23,6 +23,10 @@ const createTablesQuery = {
     quiz_id UUID PRIMARY KEY,
     quiz_data JSONB NOT NULL
   )`,
+  typingContents: `CREATE TABLE IF NOT EXISTS typingContents (
+    id UUID PRIMARY KEY,
+    data JSONB NOT NULL
+  )`,
 };
 
 // Function to initialize database tables
@@ -57,6 +61,13 @@ async function testConnection() {
 
 testConnection();
 
+function escapeString(input) {
+  return input
+    .replace(/\\/g, "\\\\") // Escape backslashes
+    .replace(/"/g, '\\"') // Escape double quotes
+    .replace(/'/g, "\\'"); // Escape single quotes
+}
+
 // ======================= MAIN APP PART =======================
 
 // Middleware to parse JSON
@@ -71,48 +82,35 @@ app.get("/", (req, res) => {
 
 // POST endpoint to store data
 app.post("/save", async (req, res) => {
-  const { quizData } = req.body;
+  const { content } = req.body;
 
-  if (!quizData) {
+  if (!content) {
     return res
       .status(400)
-      .send({ status: "error", message: "quizData is required" });
+      .json({ status: "error", message: "Content is required" });
   }
 
-  console.log("Quiz data:", quizData);
+  const sanitizedContent = escapeString(content);
 
-  // const processedQuizData = quizData
-  //   .replace(/[\u201C\u201D\u2018\u2019]/g, '"')
-  //   .replace(/```json\s*|\s*```/g, "")
-  //   .replace(/\n/g, "")
-  //   .replace(/,\s*([}\]])/g, "$1")
-  //   .replace(/([{,]\s*)(\w+)(:)/g, '$1"$2"$3')
-  //   // Fix nested arrays in options
-  //   .replace(/\[\s*\[(.*?)\]\s*,/g, '["$1",')
-  //   .trim();
+  console.log("Unsanitized content:", content);
+  console.log("Sanitized content:", sanitizedContent);
 
-  // console.log("Processed quiz data:", processedQuizData);
+  try {
+    const contentId = require("uuid").v4(); // Generate unique ID
+    const result = await pool.query(
+      "INSERT INTO typingContents (id, data) VALUES ($1, $2) RETURNING id",
+      [contentId, JSON.stringify(sanitizedContent)]
+    );
 
-  // const parsedQuizData = JSON.parse(processedQuizData);
-
-  // console.log("Parsed quiz data:", parsedQuizData);
-
-  // try {
-  //   const quizId = require("uuid").v4(); // Generate unique ID
-  //   const result = await pool.query(
-  //     "INSERT INTO quizzes (quiz_id, quiz_data) VALUES ($1, $2) RETURNING quiz_id",
-  //     [quizId, JSON.stringify(parsedQuizData)]
-  //   );
-
-  //   res.status(200).send({
-  //     status: "success",
-  //     message: "Quiz successfully stored",
-  //     quizId: result.rows[0].quiz_id,
-  //   });
-  // } catch (error) {
-  //   console.error("Error storing quiz:", error);
-  //   res.status(500).send({ status: "error", message: "Database error" });
-  // }
+    res.status(200).json({
+      status: "success",
+      message: "Quiz successfully stored",
+      quizId: result.rows[0].id,
+    });
+  } catch (error) {
+    console.error("Error storing quiz:", error);
+    res.status(500).json({ status: "error", message: "Database error" });
+  }
 });
 
 // Start the server
