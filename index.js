@@ -105,7 +105,7 @@ app.post("/save", async (req, res) => {
     res
       .status(200)
       .send(
-        `Hurray! You can now view and type your content over at https://quizx-agent.vercel.app/${contentId}`
+        `Hurray! You can now view and type your content over at https://typecraft.vercel.app/${contentId}`
       );
   } catch (error) {
     console.error("Error storing content:", error);
