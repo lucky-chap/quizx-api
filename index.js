@@ -8,7 +8,7 @@ const { Pool } = require("pg");
 const { faker } = require("@faker-js/faker");
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 4000;
 
 // Enable CORS for all origins
 app.use(cors());
@@ -20,11 +20,7 @@ const pool = new Pool({
 
 // Create tables query
 const createTablesQuery = {
-  quizzes: `CREATE TABLE IF NOT EXISTS quizzes (
-    quiz_id UUID PRIMARY KEY,
-    quiz_data JSONB NOT NULL
-  )`,
-  typingContents: `CREATE TABLE IF NOT EXISTS typingContents (
+  TypingContent: `CREATE TABLE IF NOT EXISTS "TypingContent" (
     id UUID PRIMARY KEY,
     data JSONB NOT NULL
   )`,
@@ -88,7 +84,7 @@ app.get("/lorem", async (req, res) => {
   try {
     const contentId = require("uuid").v4(); // Generate unique ID
     const result = await pool.query(
-      "INSERT INTO typingContents (id, data) VALUES ($1, $2) RETURNING id",
+      `INSERT INTO "TypingContent" (id, data) VALUES ($1, $2) RETURNING id`,
       [contentId, JSON.stringify(paragraph)]
     );
 
@@ -123,7 +119,7 @@ app.post("/save", async (req, res) => {
   try {
     const contentId = require("uuid").v4(); // Generate unique ID
     const result = await pool.query(
-      "INSERT INTO typingContents (id, data) VALUES ($1, $2) RETURNING id",
+      `INSERT INTO "TypingContent" (id, data) VALUES ($1, $2) RETURNING id`,
       [contentId, JSON.stringify(sanitizedContent)]
     );
 
