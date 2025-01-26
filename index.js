@@ -58,13 +58,6 @@ async function testConnection() {
 
 testConnection();
 
-function escapeString(input) {
-  return input
-    .replace(/\\/g, "\\\\") // Escape backslashes
-    .replace(/"/g, '\\"') // Escape double quotes
-    .replace(/'/g, "\\'"); // Escape single quotes
-}
-
 // ======================= MAIN APP PART =======================
 
 // Middleware to parse JSON
@@ -111,16 +104,13 @@ app.post("/save", async (req, res) => {
       .json({ status: "error", message: "Content is required" });
   }
 
-  const sanitizedContent = escapeString(content);
-
-  console.log("Unsanitized content:", content);
-  console.log("Sanitized content:", sanitizedContent);
+  console.log("Content:", content);
 
   try {
     const contentId = require("uuid").v4(); // Generate unique ID
     const result = await pool.query(
       `INSERT INTO "TypingContent" (id, data) VALUES ($1, $2) RETURNING id`,
-      [contentId, JSON.stringify(sanitizedContent)]
+      [contentId, JSON.stringify(content)]
     );
 
     console.log("Stored content with ID:", result.rows[0].id);
