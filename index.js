@@ -5,6 +5,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const { Pool } = require("pg");
+const { faker } = require("@faker-js/faker");
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -80,7 +81,31 @@ app.get("/", (req, res) => {
   });
 });
 
-// POST endpoint to store data
+// GET endpoint to generate Lorem data using Faker.js
+app.get("/lorem", async (req, res) => {
+  const paragraph = faker.lorem.paragraphs(4);
+
+  try {
+    const contentId = require("uuid").v4(); // Generate unique ID
+    const result = await pool.query(
+      "INSERT INTO typingContents (id, data) VALUES ($1, $2) RETURNING id",
+      [contentId, JSON.stringify(paragraph)]
+    );
+
+    console.log("Stored content with ID:", result.rows[0].id);
+
+    res
+      .status(200)
+      .send(
+        `Head on to https://typecraft.vercel.app/${result.rows[0].id} to show the world your typing skills!`
+      );
+  } catch (error) {
+    console.error("Error storing content:", error);
+    res.status(500).json({ status: "error", message: "Database error" });
+  }
+});
+
+// POST endpoint to store data from Agent.ai
 app.post("/save", async (req, res) => {
   const { content } = req.body;
 
@@ -102,10 +127,12 @@ app.post("/save", async (req, res) => {
       [contentId, JSON.stringify(sanitizedContent)]
     );
 
+    console.log("Stored content with ID:", result.rows[0].id);
+
     res
       .status(200)
       .send(
-        `Hurray! You can now view and type your content over at https://typecraft.vercel.app/${contentId}`
+        `Head on to https://typecraft.vercel.app/${result.rows[0].id} to show the world your typing skills!`
       );
   } catch (error) {
     console.error("Error storing content:", error);
